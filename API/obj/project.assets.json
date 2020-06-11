@@ -1,0 +1,89 @@
+{
+  "version": 3,
+  "targets": {
+    ".NETCoreApp,Version=v3.1": {
+      "Game/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v2.0",
+        "compile": {
+          "bin/placeholder/Game.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Game.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Game/1.0.0": {
+      "type": "project",
+      "path": "../Game/Game.csproj",
+      "msbuildProject": "../Game/Game.csproj"
+    }
+  },
+  "projectFileDependencyGroups": {
+    ".NETCoreApp,Version=v3.1": [
+      "Game >= 1.0.0"
+    ]
+  },
+  "packageFolders": {
+    "C:\\Users\\Johan\\.nuget\\packages\\": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "D:\\Coba\\Project\\DDD\\Werewolf.NET\\API\\API.csproj",
+      "projectName": "API",
+      "projectPath": "D:\\Coba\\Project\\DDD\\Werewolf.NET\\API\\API.csproj",
+      "packagesPath": "C:\\Users\\Johan\\.nuget\\packages\\",
+      "outputPath": "D:\\Coba\\Project\\DDD\\Werewolf.NET\\API\\obj\\",
+      "projectStyle": "PackageReference",
+      "configFilePaths": [
+        "C:\\Users\\Johan\\AppData\\Roaming\\NuGet\\NuGet.Config"
+      ],
+      "originalTargetFrameworks": [
+        "netcoreapp3.1"
+      ],
+      "sources": {
+        "https://api.nuget.org/v3/index.json": {}
+      },
+      "frameworks": {
+        "netcoreapp3.1": {
+          "projectReferences": {
+            "D:\\Coba\\Project\\DDD\\Werewolf.NET\\Game\\Game.csproj": {
+              "projectPath": "D:\\Coba\\Project\\DDD\\Werewolf.NET\\Game\\Game.csproj"
+            }
+          }
+        }
+      },
+      "warningProperties": {
+        "warnAsError": [
+          "NU1605"
+        ]
+      }
+    },
+    "frameworks": {
+      "netcoreapp3.1": {
+        "imports": [
+          "net461",
+          "net462",
+          "net47",
+          "net471",
+          "net472",
+          "net48"
+        ],
+        "assetTargetFallback": true,
+        "warn": true,
+        "frameworkReferences": {
+          "Microsoft.AspNetCore.App": {
+            "privateAssets": "none"
+          },
+          "Microsoft.NETCore.App": {
+            "privateAssets": "all"
+          }
+        },
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.201\\RuntimeIdentifierGraph.json"
+      }
+    }
+  }
+}
