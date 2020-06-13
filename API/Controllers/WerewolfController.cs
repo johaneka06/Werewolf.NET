@@ -75,7 +75,9 @@ namespace API.Controllers
         }
 
         public void init(){
-            game = new WerewolfGame(Players, PlayerRole);
+            IExpGainer win = new WerewolfWin();
+            IExpGainer lose = new WerewolfLose();
+            game = new WerewolfGame(win, lose, Players, PlayerRole);
         }
 
     }

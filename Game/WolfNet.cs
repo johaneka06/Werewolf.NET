@@ -7,6 +7,8 @@ namespace Werewolf.NET.Game
     {
         protected bool _gameEnded;
 
+        protected IExpGainer _WerewolfWin;
+        protected IExpGainer _WerewolfLose;
         protected List<User> _players;
         protected List<int> _userRoles;
         protected Roles werewolf;
@@ -40,12 +42,14 @@ namespace Werewolf.NET.Game
             }
         }
 
-        public WolfNet(List<User> players, List<int> UserRoles)
+        public WolfNet(IExpGainer win, IExpGainer lose, List<User> players, List<int> UserRoles)
         {
             this.werewolf = new Roles(1, new RoleName("Werewolf"));
             this.villager = new Roles(2, new RoleName("Villager"));
             this.seer = new Roles(3, new RoleName("Seer"));
 
+            this._WerewolfWin = win;
+            this._WerewolfLose = lose;
             this._players = players;
             this._userRoles = UserRoles;
             this._gameEnded = false;

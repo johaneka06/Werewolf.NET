@@ -28,7 +28,7 @@ namespace Werewolf.NET.Game
 
     public class WerewolfGame : WolfNet
     {
-        public WerewolfGame(List<User> players, List<int> UserRoles) : base(players, UserRoles) { }
+        public WerewolfGame(IExpGainer win, IExpGainer lose, List<User> players, List<int> UserRoles) : base(win, lose, players, UserRoles) { }
 
         protected override void Init()
         {
@@ -141,7 +141,7 @@ namespace Werewolf.NET.Game
 
         protected override void ExecuteVillager(User killed)
         {
-            killed.AddEXP(4);
+            killed.AddEXP(_WerewolfLose.Gain());
 
             if (seer.Player.Contains(killed))
             {
@@ -164,7 +164,7 @@ namespace Werewolf.NET.Game
 
         protected override bool ExecuteWolf(User killed)
         {
-            killed.AddEXP(4);
+            killed.AddEXP(_WerewolfLose.Gain());
 
             if (Werewolf.Player.Contains(killed))
             {
@@ -194,30 +194,30 @@ namespace Werewolf.NET.Game
             {
                 foreach (User player in werewolf.Player)
                 {
-                    player.AddEXP(8);
+                    player.AddEXP(_WerewolfWin.Gain());
                 }
                 foreach (User player in villager.Player)
                 {
-                    player.AddEXP(4);
+                    player.AddEXP(_WerewolfLose.Gain());
                 }
                 foreach (User player in seer.Player)
                 {
-                    player.AddEXP(4);
+                    player.AddEXP(_WerewolfLose.Gain());
                 }
             }
             else if (isWin())
             {
                 foreach (User player in werewolf.Player)
                 {
-                    player.AddEXP(4);
+                    player.AddEXP(_WerewolfLose.Gain());
                 }
                 foreach (User player in villager.Player)
                 {
-                    player.AddEXP(8);
+                    player.AddEXP(_WerewolfWin.Gain());
                 }
                 foreach (User player in seer.Player)
                 {
-                    player.AddEXP(8);
+                    player.AddEXP(_WerewolfWin.Gain());
                 }
             }
         }
