@@ -76,7 +76,7 @@ namespace Werewolf.NET.Game
             if (count == Werewolf.Player.Count)
             {
                 ExecuteVillager(v.Executed);
-                Console.WriteLine("Player count: " + _players.Count);
+                Console.WriteLine("Player count: " + totalPlayer);
             }
 
             if (isLose()) return true;
@@ -110,7 +110,7 @@ namespace Werewolf.NET.Game
 
             User wastedUser = new User();
 
-            if (count == _players.Count)
+            if (count == totalPlayer)
             {
                 maxCount = 0;
                 for (int i = 0; i < VoteNumber.Count; i++)
@@ -126,8 +126,8 @@ namespace Werewolf.NET.Game
                 if (ExecuteWolf(wastedUser)) Console.WriteLine("You have eliminate wolf: " + Name);
                 else Console.WriteLine("Uh. You killed the wrong wolf: " + Name);
 
-                _players.Remove(wastedUser);
-                Console.WriteLine("Player count: " + _players.Count);
+                totalPlayer--;
+                Console.WriteLine("Player count: " + totalPlayer);
 
                 count = 0;
                 UserVoted = new List<User>();
@@ -154,7 +154,7 @@ namespace Werewolf.NET.Game
 
             Console.WriteLine("Player Died: " + killed.Name);
 
-            _players.Remove(killed);
+            totalPlayer--;
 
             count = 0;
 

@@ -21,12 +21,12 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<newList> Get()
+        public newList Get()
         {
             newList newlist = new newList();
 
 
-            return Enumerable.Range(1, 1).Select(index => newlist).ToArray();
+            return newlist;
         }
     }
 
@@ -35,6 +35,17 @@ namespace API.Controllers
         private List<User> Players;
         private List<int> PlayerRole;
         WolfNet game;
+
+        User ayu;
+        User bani;
+        User cinta;
+        User dita;
+        User ester;
+        User fina;
+        User grace;
+        User hanako;
+        User ivanka;
+        User jean;
 
         public WolfNet Player
         {
@@ -49,16 +60,27 @@ namespace API.Controllers
             this.Players = new List<User>();
             this.PlayerRole = new List<int>();
 
-            Players.Add(User.createUser("Ayu"));
-            Players.Add(User.createUser("Bani"));
-            Players.Add(User.createUser("Cinta"));
-            Players.Add(User.createUser("Dita"));
-            Players.Add(User.createUser("Ester"));
-            Players.Add(User.createUser("Fina"));
-            Players.Add(User.createUser("Grace"));
-            Players.Add(User.createUser("Hanako"));
-            Players.Add(User.createUser("Ivanka"));
-            Players.Add(User.createUser("Jean"));
+            ayu = User.createUser("Ayu");
+            bani = User.createUser("Bani");
+            cinta = User.createUser("Cinta");
+            dita = User.createUser("Dita");
+            ester = User.createUser("Ester");
+            fina = User.createUser("Fina");
+            grace = User.createUser("Grace");
+            hanako = User.createUser("Hanako");
+            ivanka = User.createUser("Ivanka");
+            jean = User.createUser("Jean");
+
+            Players.Add(ayu);
+            Players.Add(bani);
+            Players.Add(cinta);
+            Players.Add(dita);
+            Players.Add(ester);
+            Players.Add(fina);
+            Players.Add(grace);
+            Players.Add(hanako);
+            Players.Add(ivanka);
+            Players.Add(jean);
 
             PlayerRole.Add(1);
             PlayerRole.Add(3);
@@ -71,13 +93,57 @@ namespace API.Controllers
             PlayerRole.Add(1);
             PlayerRole.Add(2);
 
-            init();
+            win = new WerewolfWin();
+            lose = new WerewolfLose();
+
+            CheckWin();
+        }
+        IExpGainer win;
+        IExpGainer lose;
+
+        public void init()
+        {
+            win = new WerewolfWin();
+            lose = new WerewolfLose();
+            game = new WerewolfGame(win, lose, Players, PlayerRole);
         }
 
-        public void init(){
-            IExpGainer win = new WerewolfWin();
-            IExpGainer lose = new WerewolfLose();
+        public void CheckWin()
+        {
             game = new WerewolfGame(win, lose, Players, PlayerRole);
+
+            game.Execute(new WerewolfVote(ayu, bani));
+            game.Execute(new WerewolfVote(fina, bani));
+            game.Execute(new WerewolfVote(ivanka, bani));
+
+            game.Vote(new WerewolfVote(ayu, cinta));
+            game.Vote(new WerewolfVote(cinta, ayu));
+            game.Vote(new WerewolfVote(dita, ayu));
+            game.Vote(new WerewolfVote(ester, ayu));
+            game.Vote(new WerewolfVote(fina, ayu));
+            game.Vote(new WerewolfVote(grace, ayu));
+            game.Vote(new WerewolfVote(hanako, ayu));
+            game.Vote(new WerewolfVote(ivanka, ayu));
+            game.Vote(new WerewolfVote(jean, ayu));
+
+            game.Execute(new WerewolfVote(fina, dita));
+            game.Execute(new WerewolfVote(ivanka, dita));
+
+            game.Vote(new WerewolfVote(cinta, fina));
+            game.Vote(new WerewolfVote(ester, fina));
+            game.Vote(new WerewolfVote(fina, ester));
+            game.Vote(new WerewolfVote(grace, fina));
+            game.Vote(new WerewolfVote(hanako, fina));
+            game.Vote(new WerewolfVote(ivanka, fina));
+            game.Vote(new WerewolfVote(jean, fina));
+
+            game.Execute(new WerewolfVote(ivanka, grace));
+
+            game.Vote(new WerewolfVote(cinta, ivanka));
+            game.Vote(new WerewolfVote(ester, ivanka));
+            game.Vote(new WerewolfVote(hanako, ivanka));
+            game.Vote(new WerewolfVote(ivanka, hanako));
+            game.Vote(new WerewolfVote(jean, ivanka));
         }
 
     }

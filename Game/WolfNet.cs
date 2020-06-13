@@ -42,6 +42,7 @@ namespace Werewolf.NET.Game
             }
         }
 
+        protected int totalPlayer;
         public WolfNet(IExpGainer win, IExpGainer lose, List<User> players, List<int> UserRoles)
         {
             this.werewolf = new Roles(1, new RoleName("Werewolf"));
@@ -55,6 +56,7 @@ namespace Werewolf.NET.Game
             this._gameEnded = false;
             this.isNight = true;
             this.count = 0;
+            this.totalPlayer = _players.Count;
 
             this.Init();
         }
