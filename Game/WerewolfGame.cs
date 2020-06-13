@@ -6,26 +6,23 @@ namespace Werewolf.NET.Game
 
     public class WerewolfVote : Vote
     {
-        private int totalVote;
+        private User votedPlayer;
 
-        public int VoteCount
+        public User Executed
         {
             get
             {
-                return totalVote;
+                return this.votedPlayer;
             }
         }
-
-        public WerewolfVote updateVote()
+        public WerewolfVote()
         {
-            return new WerewolfVote(currentPlayer, votedPlayer, this.totalVote + 1);
+            this.votedPlayer = new User();
         }
 
-        public WerewolfVote() { }
-
-        public WerewolfVote(User current, User VotedUser, int totalVote) : base(current, VotedUser)
+        public WerewolfVote(User current, User VotedUser) : base(current)
         {
-            this.totalVote = totalVote;
+            this.votedPlayer = VotedUser;
         }
     }
 
@@ -48,92 +45,144 @@ namespace Werewolf.NET.Game
                 idx++;
             }
             villagerToBeKilled = new WerewolfVote();
-            wolfToBeKilled = new List<WerewolfVote>();
+            UserVoted = new List<User>();
+            VoteNumber = new List<int>();
             specialPersonCount = werewolf.Player.Count + seer.Player.Count;
         }
         private WerewolfVote villagerToBeKilled;
-        private List<WerewolfVote> wolfToBeKilled;
+        private List<User> UserVoted;
+        private List<int> VoteNumber;
+        private int maxCount = 0;
 
+        protected override bool DoExecute(Vote vote)
+        {
+            WerewolfVote v = vote as WerewolfVote;
+
+            if (werewolf.Player.Contains(v.Current)) //Werewolf
+            {
+                villagerToBeKilled = v;
+            }
+            else if (seer.Player.Contains(v.Current)) //Seer job -> know player's role
+            {
+                if (werewolf.Player.Contains(v.Executed)) Console.WriteLine("Werewolf");
+                else Console.WriteLine("Villager");
+            }
+            else throw new Exception("Invalid move: Villager cannot vote in this session");
+
+            count++;
+
+            Console.WriteLine("Execute Count: " + count);
+
+            if (count == Werewolf.Player.Count)
+            {
+                ExecuteVillager(v.Executed);
+                Console.WriteLine("Player count: " + _players.Count);
+            }
+
+            if (isLose()) return true;
+            return false;
+
+        }
         protected override bool DoVote(Vote vote)
         {
             WerewolfVote v = vote as WerewolfVote;
 
-            if (isNight && specialPersonCount > 0) //Time for special person do their job
+            if (!UserVoted.Contains(v.Executed))
             {
-                if (werewolf.Player.Contains(v.Current)) //Werewolf
-                {
-                    if (villagerToBeKilled.Executed == v.Executed) villagerToBeKilled = v.updateVote();
-                    else villagerToBeKilled = v;
-                    specialPersonCount--;
-                }
-                else if (seer.Player.Contains(v.Current)) //Seer job -> know player's role
-                {
-                    if (werewolf.Player.Contains(v.Executed)) Console.WriteLine("Werewolf");
-                    else Console.WriteLine("Villager");
-                    specialPersonCount--;
-                }
-                else throw new Exception("Villager aren't eligible to vote!");
+                UserVoted.Add(v.Executed);
+                VoteNumber.Add(1);
             }
-            else if (!isNight) //Time for vote to kill whether the wolf, seer, or villager
+            else
             {
-                int maxCount = 0;
-
-                for (int i = 0; i < wolfToBeKilled.Count; i++)
+                for (int i = 0; i < VoteNumber.Count; i++)
                 {
-                    if (wolfToBeKilled[i] == v)
+                    if (UserVoted[i] == v.Executed)
                     {
-                        wolfToBeKilled[i] = wolfToBeKilled[i].updateVote();
+                        VoteNumber[i]++;
+                        break;
                     }
-
-                    if (wolfToBeKilled[i].VoteCount > maxCount) villagerToBeKilled = wolfToBeKilled[i];
                 }
             }
 
-            if (specialPersonCount == 0 && isNight)
+            count++;
+
+            Console.WriteLine("Vote Count: " + count);
+
+            User wastedUser = new User();
+
+            if (count == _players.Count)
             {
-                ExecuteVillager();
-                specialPersonCount = werewolf.Player.Count + seer.Player.Count;
-            }
-            else if (!isNight)
-            {
-                ExecuteWolf();
+                maxCount = 0;
+                for (int i = 0; i < VoteNumber.Count; i++)
+                {
+                    if (VoteNumber[i] > maxCount)
+                    {
+                        maxCount = VoteNumber[i];
+                        wastedUser = UserVoted[i];
+                        Console.WriteLine(wastedUser.Name);
+                    }
+                }
+                string Name = wastedUser.Name;
+                if (ExecuteWolf(wastedUser)) Console.WriteLine("You have eliminate wolf: " + Name);
+                else Console.WriteLine("Uh. You killed the wrong wolf: " + Name);
+
+                _players.Remove(wastedUser);
+                Console.WriteLine("Player count: " + _players.Count);
+
+                count = 0;
+                UserVoted = new List<User>();
+                VoteNumber = new List<int>();
             }
 
-            if (!isNight && isWin()) return true;
-            else if (isNight && isLose()) return false;
+            if (isWin() || isLose()) return true;
 
             return false;
         }
 
-        protected override void ExecuteVillager()
+        protected override void ExecuteVillager(User killed)
         {
-            villagerToBeKilled.Executed.AddEXP(4);
-            if (seer.Player.Contains(villagerToBeKilled.Executed))
+            killed.AddEXP(4);
+
+            if (seer.Player.Contains(killed))
             {
-                seer.removePlayer(villagerToBeKilled.Executed);
+                seer.removePlayer(killed);
             }
             else
             {
-                villager.removePlayer(villagerToBeKilled.Executed);
+                villager.removePlayer(killed);
             }
 
+            Console.WriteLine("Player Died: " + killed.Name);
+
+            _players.Remove(killed);
+
+            count = 0;
+
             villagerToBeKilled = null;
+            killed = null;
         }
 
-        protected override bool ExecuteWolf()
+        protected override bool ExecuteWolf(User killed)
         {
-            User killed = villagerToBeKilled.Executed;
             killed.AddEXP(4);
 
-            if (Werewolf.Player.Contains(villagerToBeKilled.Executed))
+            if (Werewolf.Player.Contains(killed))
             {
-                werewolf.removePlayer(villagerToBeKilled.Executed);
+                werewolf.removePlayer(killed);
 
                 villagerToBeKilled = null;
                 return true;
             }
-            else if (Seer.Player.Contains(villagerToBeKilled.Executed)) seer.removePlayer(villagerToBeKilled.Executed);
-            else villager.removePlayer(villagerToBeKilled.Executed);
+
+            else if (Seer.Player.Contains(killed)) seer.removePlayer(killed);
+            else villager.removePlayer(killed);
+
+            Console.WriteLine("Player Died: " + killed.Name);
+
+            villagerToBeKilled = null;
+            killed = null;
+
+            count = 0;
 
             return false;
         }
@@ -141,7 +190,7 @@ namespace Werewolf.NET.Game
         protected override void giveExp()
         {
             //If Lose -> Villager died
-            if (checkAnyWolf())
+            if (isLose())
             {
                 foreach (User player in werewolf.Player)
                 {
@@ -156,7 +205,7 @@ namespace Werewolf.NET.Game
                     player.AddEXP(4);
                 }
             }
-            else if (_gameEnded && isWin())
+            else if (isWin())
             {
                 foreach (User player in werewolf.Player)
                 {

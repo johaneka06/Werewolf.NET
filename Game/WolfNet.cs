@@ -14,6 +14,7 @@ namespace Werewolf.NET.Game
         protected Roles seer;
         protected bool isNight;
         protected int specialPersonCount;
+        protected int count;
 
         public Roles Werewolf
         {
@@ -49,6 +50,7 @@ namespace Werewolf.NET.Game
             this._userRoles = UserRoles;
             this._gameEnded = false;
             this.isNight = true;
+            this.count = 0;
 
             this.Init();
         }
@@ -71,26 +73,36 @@ namespace Werewolf.NET.Game
             return isEnded;
         }
 
-        protected abstract void Init();
+        public bool Execute(Vote vote)
+        {
+            if (_gameEnded) throw new Exception("Game already ended");
 
+            bool isEnded = DoExecute(vote);
+
+            if (!isEnded)
+            {
+                isNight = !isNight;
+                return isEnded;
+            }
+
+            _gameEnded = true;
+
+            this.giveExp();
+
+            return isEnded;
+        }
+
+        protected abstract void Init();
+        protected abstract bool DoExecute(Vote vote);
         protected abstract bool DoVote(Vote vote);
-        protected abstract void ExecuteVillager();
-        protected abstract bool ExecuteWolf();
+        protected abstract void ExecuteVillager(User killed);
+        protected abstract bool ExecuteWolf(User killed);
         protected abstract void giveExp();
     }
 
     public abstract class Vote
     {
         protected User currentPlayer;
-        protected User votedPlayer;
-
-        public User Executed
-        {
-            get
-            {
-                return this.votedPlayer;
-            }
-        }
 
         public User Current
         {
@@ -100,15 +112,13 @@ namespace Werewolf.NET.Game
             }
         }
 
-        public Vote(User current, User vote)
+        public Vote(User current)
         {
             this.currentPlayer = current;
-            this.votedPlayer = vote;
         }
 
         public Vote()
         {
-            this.votedPlayer = new User();
             this.currentPlayer = new User();
         }
 
