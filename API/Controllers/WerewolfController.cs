@@ -93,13 +93,7 @@ namespace API.Controllers
             PlayerRole.Add(1);
             PlayerRole.Add(2);
 
-            game = new WerewolfGame(Players, PlayerRole);
-
-            WerewolfResultHandler win = new WinHandler(new WerewolfWin());
-            WerewolfResultHandler lose = new LoseHandler(new WerewolfLose());
-
-            game.Attach(win);
-            game.Attach(lose);
+            game = GameFactory.Create("werewolf", Players, PlayerRole);
 
             CheckWin();
         }

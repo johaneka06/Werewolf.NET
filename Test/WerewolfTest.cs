@@ -60,13 +60,13 @@ namespace Test
             PlayerRole.Add(1);
             PlayerRole.Add(2);
 
-            game = new WerewolfGame(Players, PlayerRole);
+            game = GameFactory.Create("werewolf", Players, PlayerRole);
+        }
 
-            WerewolfResultHandler win = new WinHandler(new WerewolfWin());
-            WerewolfResultHandler lose = new LoseHandler(new WerewolfLose());
-
-            game.Attach(win);
-            game.Attach(lose);
+        [Fact]
+        public void CheckGameName()
+        {
+            Assert.Equal("Werewolf", game.GetGameName());
         }
 
         [Fact]

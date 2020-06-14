@@ -28,15 +28,26 @@ namespace Werewolf.NET.Game
 
     public class WerewolfGame : WolfNet
     {
-        public WerewolfGame(List<User> players, List<int> UserRoles) : base(players, UserRoles) { }
-
-        protected override void Init()
+        protected bool _gameEnded;
+        protected int totalPlayer;
+        public WerewolfGame(List<User> players, List<int> UserRoles)
         {
-            if (this._players.Count < 5) throw new Exception("Player must be 5 or more!");
-            else if (this._players.Count != this._userRoles.Count) throw new Exception("Invalid assign role: Not every player is assigned with their roles!");
+            werewolf = new Roles(1, new RoleName("Werewolf"));
+            villager = new Roles(2, new RoleName("Villager"));
+            seer = new Roles(3, new RoleName("Seer"));
 
+            _players = players;
+            _userRoles = UserRoles;
+
+            if (_players.Count < 5) throw new Exception("Player must be 5 or more!");
+            else if (_players.Count != this._userRoles.Count) throw new Exception("Invalid assign role: Not every player is assigned with their roles!");
+
+            _gameEnded = false;
+            isNight = true;
+            count = 0;
+            totalPlayer = _players.Count;
+            
             int idx = 0;
-
             foreach (int RoleIdx in _userRoles)
             {
                 if (RoleIdx == 1) werewolf.AddPlayer(_players[idx]);
@@ -44,17 +55,18 @@ namespace Werewolf.NET.Game
                 else if (RoleIdx == 3) seer.AddPlayer(_players[idx]);
                 idx++;
             }
+
             villagerToBeKilled = new WerewolfVote();
             UserVoted = new List<User>();
             VoteNumber = new List<int>();
-            specialPersonCount = werewolf.Player.Count + seer.Player.Count;
         }
+
         private WerewolfVote villagerToBeKilled;
         private List<User> UserVoted;
         private List<int> VoteNumber;
         private int maxCount = 0;
 
-        protected override void DoExecute(Vote vote)
+        public override void Execute(Vote vote)
         {
             WerewolfVote v = vote as WerewolfVote;
 
@@ -92,7 +104,7 @@ namespace Werewolf.NET.Game
             }
 
         }
-        protected override void DoVote(Vote vote)
+        public override void Vote(Vote vote)
         {
             WerewolfVote v = vote as WerewolfVote;
 
@@ -143,17 +155,20 @@ namespace Werewolf.NET.Game
                 VoteNumber.Clear();
             }
 
-            if (isWin()){
+            if (isWin())
+            {
                 //If win, then there's no wolf remaining. So lose event are put at ExecuteVillager.
                 //Logic here: Every player executed, it count as lose. 
 
                 _gameEnded = true;
-                
-                foreach(User winner in villager.Player){
+
+                foreach (User winner in villager.Player)
+                {
                     Broadcast(new Win(winner));
                 }
 
-                foreach(User winner in seer.Player){
+                foreach (User winner in seer.Player)
+                {
                     Broadcast(new Win(winner));
                 }
             }
@@ -218,5 +233,9 @@ namespace Werewolf.NET.Game
             return (werewolf.Player.Count == 0) ? true : false;
         }
 
+        public override string GetGameName()
+        {
+            return "Werewolf";
+        }
     }
 }
