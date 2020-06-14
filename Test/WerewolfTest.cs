@@ -21,8 +21,7 @@ namespace Test
         User ivanka;
         User jean;
         WolfNet game;
-        IExpGainer win;
-        IExpGainer lose;
+
         public WerewolfTest()
         {
             this.Players = new List<User>();
@@ -61,8 +60,13 @@ namespace Test
             PlayerRole.Add(1);
             PlayerRole.Add(2);
 
-            win = new WerewolfWin();
-            lose = new WerewolfLose();
+            game = new WerewolfGame(Players, PlayerRole);
+
+            WerewolfResultHandler win = new WinHandler(new WerewolfWin());
+            WerewolfResultHandler lose = new LoseHandler(new WerewolfLose());
+
+            game.Attach(win);
+            game.Attach(lose);
         }
 
         [Fact]
@@ -86,7 +90,7 @@ namespace Test
 
             try
             {
-                WolfNet ww = new WerewolfGame(win, lose, players, UserRole);
+                WolfNet ww = new WerewolfGame(players, UserRole);
             }
             catch (Exception e)
             {
@@ -99,8 +103,6 @@ namespace Test
         public void InvalidMove()
         {
             Exception res = null;
-
-            game = new WerewolfGame(win, lose, Players, PlayerRole);
 
             game.Execute(new WerewolfVote(Players[0], Players[3]));
             game.Execute(new WerewolfVote(Players[5], Players[3]));
@@ -120,8 +122,6 @@ namespace Test
         [Fact]
         public void CheckHighestCount()
         {
-            game = new WerewolfGame(win, lose, Players, PlayerRole);
-
             game.Vote(new WerewolfVote(Players[0], Players[1]));
             game.Vote(new WerewolfVote(Players[1], Players[0]));
             game.Vote(new WerewolfVote(Players[2], Players[0]));
@@ -139,7 +139,6 @@ namespace Test
         [Fact]
         public void CheckLose()
         {
-            game = new WerewolfGame(win, lose, Players, PlayerRole);
 
             game.Execute(new WerewolfVote(ayu, bani));
             game.Execute(new WerewolfVote(fina, bani));
@@ -189,8 +188,6 @@ namespace Test
         [Fact]
         public void CheckWin()
         {
-            game = new WerewolfGame(win, lose, Players, PlayerRole);
-
             game.Execute(new WerewolfVote(ayu, bani));
             game.Execute(new WerewolfVote(fina, bani));
             game.Execute(new WerewolfVote(ivanka, bani));

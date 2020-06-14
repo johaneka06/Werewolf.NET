@@ -47,7 +47,7 @@ namespace API.Controllers
         User ivanka;
         User jean;
 
-        public WolfNet Player
+        public WolfNet Game
         {
             get
             {
@@ -93,25 +93,19 @@ namespace API.Controllers
             PlayerRole.Add(1);
             PlayerRole.Add(2);
 
-            win = new WerewolfWin();
-            lose = new WerewolfLose();
+            game = new WerewolfGame(Players, PlayerRole);
+
+            WerewolfResultHandler win = new WinHandler(new WerewolfWin());
+            WerewolfResultHandler lose = new LoseHandler(new WerewolfLose());
+
+            game.Attach(win);
+            game.Attach(lose);
 
             CheckWin();
-        }
-        IExpGainer win;
-        IExpGainer lose;
-
-        public void init()
-        {
-            win = new WerewolfWin();
-            lose = new WerewolfLose();
-            game = new WerewolfGame(win, lose, Players, PlayerRole);
         }
 
         public void CheckWin()
         {
-            game = new WerewolfGame(win, lose, Players, PlayerRole);
-
             game.Execute(new WerewolfVote(ayu, bani));
             game.Execute(new WerewolfVote(fina, bani));
             game.Execute(new WerewolfVote(ivanka, bani));

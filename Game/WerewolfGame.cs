@@ -28,7 +28,7 @@ namespace Werewolf.NET.Game
 
     public class WerewolfGame : WolfNet
     {
-        public WerewolfGame(IExpGainer win, IExpGainer lose, List<User> players, List<int> UserRoles) : base(win, lose, players, UserRoles) { }
+        public WerewolfGame(List<User> players, List<int> UserRoles) : base(players, UserRoles) { }
 
         protected override void Init()
         {
@@ -54,13 +54,14 @@ namespace Werewolf.NET.Game
         private List<int> VoteNumber;
         private int maxCount = 0;
 
-        protected override bool DoExecute(Vote vote)
+        protected override void DoExecute(Vote vote)
         {
             WerewolfVote v = vote as WerewolfVote;
 
             if (werewolf.Player.Contains(v.Current)) //Werewolf
             {
                 villagerToBeKilled = v;
+                count++;
             }
             else if (seer.Player.Contains(v.Current)) //Seer job -> know player's role
             {
@@ -68,8 +69,6 @@ namespace Werewolf.NET.Game
                 else Console.WriteLine("Villager");
             }
             else throw new Exception("Invalid move: Villager cannot vote in this session");
-
-            count++;
 
             Console.WriteLine("Execute Count: " + count);
 
@@ -79,11 +78,21 @@ namespace Werewolf.NET.Game
                 Console.WriteLine("Player count: " + totalPlayer);
             }
 
-            if (isLose()) return true;
-            return false;
+            if (isLose())
+            {
+                //If villager lose, then there's no villager left, and only wolf are remains.
+                //Logic : When someone executed by wolf, it counts as lose.
+
+                _gameEnded = true;
+
+                foreach (User winner in werewolf.Player)
+                {
+                    Broadcast(new Win(winner));
+                }
+            }
 
         }
-        protected override bool DoVote(Vote vote)
+        protected override void DoVote(Vote vote)
         {
             WerewolfVote v = vote as WerewolfVote;
 
@@ -130,18 +139,30 @@ namespace Werewolf.NET.Game
                 Console.WriteLine("Player count: " + totalPlayer);
 
                 count = 0;
-                UserVoted = new List<User>();
-                VoteNumber = new List<int>();
+                UserVoted.Clear();
+                VoteNumber.Clear();
             }
 
-            if (isWin() || isLose()) return true;
+            if (isWin()){
+                //If win, then there's no wolf remaining. So lose event are put at ExecuteVillager.
+                //Logic here: Every player executed, it count as lose. 
 
-            return false;
+                _gameEnded = true;
+                
+                foreach(User winner in villager.Player){
+                    Broadcast(new Win(winner));
+                }
+
+                foreach(User winner in seer.Player){
+                    Broadcast(new Win(winner));
+                }
+            }
+
         }
 
         protected override void ExecuteVillager(User killed)
         {
-            killed.AddEXP(_WerewolfLose.Gain());
+            Broadcast(new Lose(killed));
 
             if (seer.Player.Contains(killed))
             {
@@ -164,7 +185,7 @@ namespace Werewolf.NET.Game
 
         protected override bool ExecuteWolf(User killed)
         {
-            killed.AddEXP(_WerewolfLose.Gain());
+            Broadcast(new Lose(killed));
 
             if (Werewolf.Player.Contains(killed))
             {
@@ -187,59 +208,15 @@ namespace Werewolf.NET.Game
             return false;
         }
 
-        protected override void giveExp()
-        {
-            //If Lose -> Villager died
-            if (isLose())
-            {
-                foreach (User player in werewolf.Player)
-                {
-                    player.AddEXP(_WerewolfWin.Gain());
-                }
-                foreach (User player in villager.Player)
-                {
-                    player.AddEXP(_WerewolfLose.Gain());
-                }
-                foreach (User player in seer.Player)
-                {
-                    player.AddEXP(_WerewolfLose.Gain());
-                }
-            }
-            else if (isWin())
-            {
-                foreach (User player in werewolf.Player)
-                {
-                    player.AddEXP(_WerewolfLose.Gain());
-                }
-                foreach (User player in villager.Player)
-                {
-                    player.AddEXP(_WerewolfWin.Gain());
-                }
-                foreach (User player in seer.Player)
-                {
-                    player.AddEXP(_WerewolfWin.Gain());
-                }
-            }
-        }
-
         private bool isLose()
-        {
-            return checkAnyVilager();
-        }
-
-        private bool checkAnyVilager()
         {
             return (villager.Player.Count == 0) ? true : false;
         }
 
         private bool isWin()
         {
-            return checkAnyWolf();
-        }
-
-        private bool checkAnyWolf()
-        {
             return (werewolf.Player.Count == 0) ? true : false;
         }
+
     }
 }

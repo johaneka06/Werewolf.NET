@@ -31,8 +31,7 @@ namespace API.Controllers
     public class newClass{
         private List<User> Players;
         private List<int> PlayerRole;
-        WolfNet game;
-
+        
         User ayu;
         User bani;
         User cinta;
@@ -89,58 +88,6 @@ namespace API.Controllers
             PlayerRole.Add(2);
             PlayerRole.Add(1);
             PlayerRole.Add(2);
-
-            win = new WerewolfWin();
-            lose = new WerewolfLose();
-
-            CheckWin();
-        }
-        IExpGainer win;
-        IExpGainer lose;
-
-        public void init()
-        {
-            win = new WerewolfWin();
-            lose = new WerewolfLose();
-            game = new WerewolfGame(win, lose, Players, PlayerRole);
-        }
-
-        public void CheckWin()
-        {
-            game = new WerewolfGame(win, lose, Players, PlayerRole);
-
-            game.Execute(new WerewolfVote(ayu, bani));
-            game.Execute(new WerewolfVote(fina, bani));
-            game.Execute(new WerewolfVote(ivanka, bani));
-
-            game.Vote(new WerewolfVote(ayu, cinta));
-            game.Vote(new WerewolfVote(cinta, ayu));
-            game.Vote(new WerewolfVote(dita, ayu));
-            game.Vote(new WerewolfVote(ester, ayu));
-            game.Vote(new WerewolfVote(fina, ayu));
-            game.Vote(new WerewolfVote(grace, ayu));
-            game.Vote(new WerewolfVote(hanako, ayu));
-            game.Vote(new WerewolfVote(ivanka, ayu));
-            game.Vote(new WerewolfVote(jean, ayu));
-
-            game.Execute(new WerewolfVote(fina, dita));
-            game.Execute(new WerewolfVote(ivanka, dita));
-
-            game.Vote(new WerewolfVote(cinta, fina));
-            game.Vote(new WerewolfVote(ester, fina));
-            game.Vote(new WerewolfVote(fina, ester));
-            game.Vote(new WerewolfVote(grace, fina));
-            game.Vote(new WerewolfVote(hanako, fina));
-            game.Vote(new WerewolfVote(ivanka, fina));
-            game.Vote(new WerewolfVote(jean, fina));
-
-            game.Execute(new WerewolfVote(ivanka, grace));
-
-            game.Vote(new WerewolfVote(cinta, ivanka));
-            game.Vote(new WerewolfVote(ester, ivanka));
-            game.Vote(new WerewolfVote(hanako, ivanka));
-            game.Vote(new WerewolfVote(ivanka, hanako));
-            game.Vote(new WerewolfVote(jean, ivanka));
         }
 
     }

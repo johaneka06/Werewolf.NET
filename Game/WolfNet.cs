@@ -3,12 +3,10 @@ using System.Collections.Generic;
 
 namespace Werewolf.NET.Game
 {
-    public abstract class WolfNet
+    public abstract class WolfNet : IObservable<WerewolfResult>
     {
         protected bool _gameEnded;
 
-        protected IExpGainer _WerewolfWin;
-        protected IExpGainer _WerewolfLose;
         protected List<User> _players;
         protected List<int> _userRoles;
         protected Roles werewolf;
@@ -43,14 +41,12 @@ namespace Werewolf.NET.Game
         }
 
         protected int totalPlayer;
-        public WolfNet(IExpGainer win, IExpGainer lose, List<User> players, List<int> UserRoles)
+        public WolfNet(List<User> players, List<int> UserRoles)
         {
             this.werewolf = new Roles(1, new RoleName("Werewolf"));
             this.villager = new Roles(2, new RoleName("Villager"));
             this.seer = new Roles(3, new RoleName("Seer"));
 
-            this._WerewolfWin = win;
-            this._WerewolfLose = lose;
             this._players = players;
             this._userRoles = UserRoles;
             this._gameEnded = false;
@@ -61,49 +57,38 @@ namespace Werewolf.NET.Game
             this.Init();
         }
 
-        public bool Vote(Vote vote)
+        public void Vote(Vote vote)
         {
             if (_gameEnded) throw new Exception("Game already ended");
 
-            bool isEnded = DoVote(vote);
-
-            if (!isEnded)
-            {
-                isNight = !isNight;
-                return isEnded;
-            }
-            _gameEnded = true;
-
-            this.giveExp();
-
-            return isEnded;
+            DoVote(vote);
         }
 
-        public bool Execute(Vote vote)
+        public void Execute(Vote vote)
         {
             if (_gameEnded) throw new Exception("Game already ended");
 
-            bool isEnded = DoExecute(vote);
-
-            if (!isEnded)
-            {
-                isNight = !isNight;
-                return isEnded;
-            }
-
-            _gameEnded = true;
-
-            this.giveExp();
-
-            return isEnded;
+            DoExecute(vote);
         }
 
         protected abstract void Init();
-        protected abstract bool DoExecute(Vote vote);
-        protected abstract bool DoVote(Vote vote);
+        protected abstract void DoExecute(Vote vote);
+        protected abstract void DoVote(Vote vote);
         protected abstract void ExecuteVillager(User killed);
         protected abstract bool ExecuteWolf(User killed);
-        protected abstract void giveExp();
+
+        protected List<IObserver<WerewolfResult>> _observer = new List<IObserver<WerewolfResult>>();
+        public void Attach(IObserver<WerewolfResult> obs)
+        {
+            _observer.Add(obs);
+        }
+        public void Broadcast(WerewolfResult evnt)
+        {
+            foreach (var obs in _observer)
+            {
+                obs.Update(evnt);
+            }
+        }
     }
 
     public abstract class Vote
