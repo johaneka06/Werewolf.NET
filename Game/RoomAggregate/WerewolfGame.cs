@@ -69,112 +69,116 @@ namespace Werewolf.NET.Game
         public override void Execute(Vote vote)
         {
             WerewolfVote v = vote as WerewolfVote;
-
-            if (werewolf.Player.Contains(v.Current)) //Werewolf
-            {
-                villagerToBeKilled = v;
-                count++;
-            }
-            else if (seer.Player.Contains(v.Current)) //Seer job -> know player's role
-            {
-                if (werewolf.Player.Contains(v.Executed)) Console.WriteLine("Werewolf");
-                else Console.WriteLine("Villager");
-            }
-            else throw new Exception("Invalid move: Villager cannot vote in this session");
-
-            Console.WriteLine("Execute Count: " + count);
-
-            if (count == Werewolf.Player.Count)
-            {
-                ExecuteVillager(v.Executed);
-                Console.WriteLine("Player count: " + totalPlayer);
-            }
-
-            if (isLose())
-            {
-                //If villager lose, then there's no villager left, and only wolf are remains.
-                //Logic : When someone executed by wolf, it counts as lose.
-
-                _gameEnded = true;
-
-                foreach (User winner in werewolf.Player)
+            if(isNight){
+                if (werewolf.Player.Contains(v.Current)) //Werewolf
                 {
-                    Broadcast(new Win(winner));
+                    villagerToBeKilled = v;
+                    count++;
+                }
+                else if (seer.Player.Contains(v.Current)) //Seer job -> know player's role
+                {
+                    if (werewolf.Player.Contains(v.Executed)) Console.WriteLine("Werewolf");
+                    else Console.WriteLine("Villager");
+                }
+                else throw new Exception("Invalid move: Villager cannot vote in this session");
+
+                Console.WriteLine("Execute Count: " + count);
+
+                if (count == Werewolf.Player.Count)
+                {
+                    ExecuteVillager(v.Executed);
+                    Console.WriteLine("Player count: " + totalPlayer);
+                }
+
+                if (isLose())
+                {
+                    //If villager lose, then there's no villager left, and only wolf are remains.
+                    //Logic : When someone executed by wolf, it counts as lose.
+
+                    _gameEnded = true;
+
+                    foreach (User winner in werewolf.Player)
+                    {
+                        Broadcast(new Win(winner));
+                    }
                 }
             }
-
+            else throw new Exception ("Cannot execute in day!");
         }
         public override void Vote(Vote vote)
         {
             WerewolfVote v = vote as WerewolfVote;
 
-            if (!UserVoted.Contains(v.Executed))
-            {
-                UserVoted.Add(v.Executed);
-                VoteNumber.Add(1);
-            }
-            else
-            {
-                for (int i = 0; i < VoteNumber.Count; i++)
+            if(!isNight){
+                if (!UserVoted.Contains(v.Executed))
                 {
-                    if (UserVoted[i] == v.Executed)
+                    UserVoted.Add(v.Executed);
+                    VoteNumber.Add(1);
+                }
+                else
+                {
+                    for (int i = 0; i < VoteNumber.Count; i++)
                     {
-                        VoteNumber[i]++;
-                        break;
+                        if (UserVoted[i] == v.Executed)
+                        {
+                            VoteNumber[i]++;
+                            break;
+                        }
+                    }
+                }
+
+                count++;
+
+                Console.WriteLine("Vote Count: " + count);
+
+                User wastedUser = new User();
+
+                if (count == totalPlayer)
+                {
+                    maxCount = 0;
+                    for (int i = 0; i < VoteNumber.Count; i++)
+                    {
+                        if (VoteNumber[i] > maxCount)
+                        {
+                            maxCount = VoteNumber[i];
+                            wastedUser = UserVoted[i];
+                            Console.WriteLine(wastedUser.Name);
+                        }
+                    }
+                    string Name = wastedUser.Name;
+                    if (ExecuteWolf(wastedUser)) Console.WriteLine("You have eliminate wolf: " + Name);
+                    else Console.WriteLine("Uh. You killed the wrong wolf: " + Name);
+
+                    totalPlayer--;
+                    Console.WriteLine("Player count: " + totalPlayer);
+
+                    count = 0;
+                    UserVoted.Clear();
+                    VoteNumber.Clear();
+                }
+
+                if (isWin())
+                {
+                    //If win, then there's no wolf remaining. So lose event are put at ExecuteVillager.
+                    //Logic here: Every player executed, it count as lose. 
+
+                    _gameEnded = true;
+
+                    foreach (User winner in villager.Player)
+                    {
+                        Broadcast(new Win(winner));
+                    }
+
+                    foreach (User winner in seer.Player)
+                    {
+                        Broadcast(new Win(winner));
                     }
                 }
             }
-
-            count++;
-
-            Console.WriteLine("Vote Count: " + count);
-
-            User wastedUser = new User();
-
-            if (count == totalPlayer)
-            {
-                maxCount = 0;
-                for (int i = 0; i < VoteNumber.Count; i++)
-                {
-                    if (VoteNumber[i] > maxCount)
-                    {
-                        maxCount = VoteNumber[i];
-                        wastedUser = UserVoted[i];
-                        Console.WriteLine(wastedUser.Name);
-                    }
-                }
-                string Name = wastedUser.Name;
-                if (ExecuteWolf(wastedUser)) Console.WriteLine("You have eliminate wolf: " + Name);
-                else Console.WriteLine("Uh. You killed the wrong wolf: " + Name);
-
-                totalPlayer--;
-                Console.WriteLine("Player count: " + totalPlayer);
-
-                count = 0;
-                UserVoted.Clear();
-                VoteNumber.Clear();
-            }
-
-            if (isWin())
-            {
-                //If win, then there's no wolf remaining. So lose event are put at ExecuteVillager.
-                //Logic here: Every player executed, it count as lose. 
-
-                _gameEnded = true;
-
-                foreach (User winner in villager.Player)
-                {
-                    Broadcast(new Win(winner));
-                }
-
-                foreach (User winner in seer.Player)
-                {
-                    Broadcast(new Win(winner));
-                }
-            }
-
+            else throw new Exception("Cannot vote in midnight!");
         }
 
+        //Execute villager means it is night. The werewolf execute other player
         protected override void ExecuteVillager(User killed)
         {
             Broadcast(new Lose(killed));
@@ -196,11 +200,16 @@ namespace Werewolf.NET.Game
 
             villagerToBeKilled = null;
             killed = null;
+
+            isNight = !isNight;
         }
 
+        //ExecuteWolf means it is day. Players do their vote to determine which player is the wolf
         protected override bool ExecuteWolf(User killed)
         {
             Broadcast(new Lose(killed));
+
+            isNight = !isNight;
 
             if (Werewolf.Player.Contains(killed))
             {

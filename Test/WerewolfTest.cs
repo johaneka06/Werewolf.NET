@@ -120,23 +120,6 @@ namespace Test
         }
 
         [Fact]
-        public void CheckHighestCount()
-        {
-            game.Vote(new WerewolfVote(Players[0], Players[1]));
-            game.Vote(new WerewolfVote(Players[1], Players[0]));
-            game.Vote(new WerewolfVote(Players[2], Players[0]));
-            game.Vote(new WerewolfVote(Players[3], Players[0]));
-            game.Vote(new WerewolfVote(Players[4], Players[1]));
-            game.Vote(new WerewolfVote(Players[5], Players[1]));
-            game.Vote(new WerewolfVote(Players[6], Players[1]));
-            game.Vote(new WerewolfVote(Players[7], Players[2]));
-            game.Vote(new WerewolfVote(Players[8], Players[1]));
-            game.Vote(new WerewolfVote(Players[9], Players[7]));
-
-            Assert.Equal(4, bani.XP);
-        }
-
-        [Fact]
         public void CheckLose()
         {
 
