@@ -40,6 +40,18 @@ namespace Werewolf.NET.Game.Database.PostgreSQL
             }
         }
 
+        public void ChangeGame(Room room, WolfNet game)
+        {
+            string query = "INSERT INTO game (gameId, roomId, game_name) VALUES(@id, @roomId, @name)";
+            using (var cmd = new NpgsqlCommand(query, _connection, _transaction))
+            {
+                cmd.Parameters.AddWithValue("id", game.ID);
+                cmd.Parameters.AddWithValue("roomId", room.ID);
+                cmd.Parameters.AddWithValue("name", game.GetGameName());
+                cmd.ExecuteNonQuery();
+            }
+        }
+
         public Room FindRoom(Guid Id)
         {
             Room r;
@@ -94,7 +106,7 @@ namespace Werewolf.NET.Game.Database.PostgreSQL
 
                 string jsonStr = JsonSerializer.Serialize(room.Game.GetMemento());
                 cmd.Parameters.Add(new NpgsqlParameter("vote", NpgsqlDbType.Jsonb) { Value = vote });
-                cmd.Parameters.AddWithValue(new NpgsqlParameter("state", NpgsqlDbType.Jsonb) { Value = jsonStr });
+                cmd.Parameters.Add(new NpgsqlParameter("state", NpgsqlDbType.Jsonb) { Value = jsonStr });
 
                 cmd.ExecuteNonQuery();
             }

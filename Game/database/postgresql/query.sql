@@ -55,4 +55,14 @@ CREATE TABLE "game_vote"
 	state		JSONB,
 	created_at	TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
 	FOREIGN KEY (roomId) REFERENCES "game_room"(roomId)
-)
+);
+
+CREATE TABLE game
+(
+	gameId		UUID PRIMARY KEY,
+	roomId		UUID,
+	game_name	VARCHAR(255),
+	created_at	TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+	deleted_at	TIMESTAMPTZ,
+	FOREIGN KEY (roomId) REFERENCES "game_room"(roomId)
+);

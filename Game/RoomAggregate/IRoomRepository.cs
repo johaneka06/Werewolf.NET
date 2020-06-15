@@ -8,6 +8,7 @@ namespace Werewolf.NET.Game
         void Join(Room room, User player, int RoleId);
         void UpdateMax(Room room, int max);
         Room FindRoom(Guid id);
+        void ChangeGame(Room room, WolfNet game);
         void Close(Room room);
 
         void AddVote(Room room, Vote vote);

@@ -100,6 +100,7 @@ namespace Test
                 uw.RoomRepo.Join(room, jean, 2);
 
                 room.StartGame("werewolf", uw.UserRepo);
+                uw.RoomRepo.ChangeGame(room, room.Game);
 
                 Vote vote;
 
@@ -217,8 +218,8 @@ namespace Test
                 room.Vote(vote);
                 uw.RoomRepo.AddVote(room, vote);
 
-                Assert.Equal(jean.XP, uw.UserRepo.FindById(jean.ID).XP);
-                Assert.Equal(fina.XP, uw.UserRepo.FindById(fina.ID).XP);
+                Assert.Equal(8, uw.UserRepo.FindById(jean.ID).XP);
+                Assert.Equal(4, uw.UserRepo.FindById(fina.ID).XP);
             }
         }
 
