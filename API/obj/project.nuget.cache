@@ -1,8 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "fctDkxFN7/ZghqsrvC74fFWPLiS+T4ZltnrEA9zYMjA1JfKzL0eTzG30O2B2AbRVAafXmF7W78XmM8lLlNJ+7w==",
+  "dgSpecHash": "95Su1DgHLFh6L0kxHlZE2kV+azE3fDcxD5GXPPD9rsNIy5YY5Bl1ErXde0HrJw/AEr4Wpa3hsqE1tKf+sSUxpA==",
   "success": true,
   "projectFilePath": "D:\\Coba\\Project\\DDD\\Werewolf.NET\\API\\API.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "C:\\Users\\Johan\\.nuget\\packages\\newtonsoft.json\\12.0.3\\newtonsoft.json.12.0.3.nupkg.sha512",
+    "C:\\Users\\Johan\\.nuget\\packages\\npgsql\\4.1.3.1\\npgsql.4.1.3.1.nupkg.sha512",
+    "C:\\Users\\Johan\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\4.6.0\\system.runtime.compilerservices.unsafe.4.6.0.nupkg.sha512"
+  ],
   "logs": []
 }
