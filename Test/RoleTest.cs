@@ -28,16 +28,19 @@ namespace Test
         [Fact]
         public void AddPlayer()
         {
-            werewolf.AddPlayer(User.createUser("Budi"));
-            Assert.Equal("Budi", werewolf.Player[0].Name);
+            User budi = User.createUser("Budi");
+            werewolf.AddPlayer(budi.ID);
+            Assert.Equal(budi.ID, werewolf.Player[0]);
 
-            villager.AddPlayer(User.createUser("Amir"));
-            villager.AddPlayer(User.createUser("Caca"));
-            villager.AddPlayer(User.createUser("Dani"));
+            villager.AddPlayer(User.createUser("Amir").ID);
+            villager.AddPlayer(User.createUser("Caca").ID);
+            villager.AddPlayer(User.createUser("Dani").ID);
             Assert.Equal(3, villager.Player.Count);
 
-            seer.AddPlayer(User.createUser("Martha"));
-            Assert.Equal("Martha", seer.Player[0].Name);
+            User martha = User.createUser("Martha");
+            seer.AddPlayer(martha.ID);
+
+            Assert.Equal(martha.ID, seer.Player[0]);
         }
 
         [Fact]
@@ -45,11 +48,11 @@ namespace Test
         {
             User us = User.createUser("Dani");
 
-            villager.AddPlayer(User.createUser("Amir"));
-            villager.AddPlayer(User.createUser("Caca"));
-            villager.AddPlayer(us);
+            villager.AddPlayer(User.createUser("Amir").ID);
+            villager.AddPlayer(User.createUser("Caca").ID);
+            villager.AddPlayer(us.ID);
 
-            villager.removePlayer(us);
+            villager.removePlayer(us.ID);
             Assert.Equal(2, villager.Player.Count);
         }
     }

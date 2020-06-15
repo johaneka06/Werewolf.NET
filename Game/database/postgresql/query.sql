@@ -1,6 +1,7 @@
 --Database: Postgresql 12
+--Created using PgAdmin v4
 
---CREATE TABLE "user"
+CREATE TABLE "user"
 (
 	userId 		UUID PRIMARY KEY,
 	userName	VARCHAR(255),
@@ -45,3 +46,13 @@ CREATE TABLE "playing_room"
 	FOREIGN KEY (userId) REFERENCES "user"(userId),
 	FOREIGN KEY (roleId) REFERENCES "role"(roleId)
 );
+
+CREATE TABLE "game_vote"
+(
+	voteId		UUID PRIMARY KEY,
+	roomId		UUID,
+	vote		JSONB,
+	state		JSONB,
+	created_at	TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+	FOREIGN KEY (roomId) REFERENCES "game_room"(roomId)
+)

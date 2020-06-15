@@ -57,41 +57,49 @@ namespace Test
         [Fact]
         public void CheckWin()
         {
-            room.Execute(new WerewolfVote(ayu, bani));
-            room.Execute(new WerewolfVote(fina, bani));
-            room.Execute(new WerewolfVote(ivanka, bani));
+            room.Execute(new WerewolfVote(ayu.ID, bani.ID));
+            room.Execute(new WerewolfVote(fina.ID, bani.ID));
+            room.Execute(new WerewolfVote(ivanka.ID, bani.ID));
 
-            room.Vote(new WerewolfVote(ayu, cinta));
-            room.Vote(new WerewolfVote(cinta, ayu));
-            room.Vote(new WerewolfVote(dita, ayu));
-            room.Vote(new WerewolfVote(ester, ayu));
-            room.Vote(new WerewolfVote(fina, ayu));
-            room.Vote(new WerewolfVote(grace, ayu));
-            room.Vote(new WerewolfVote(hanako, ayu));
-            room.Vote(new WerewolfVote(ivanka, ayu));
-            room.Vote(new WerewolfVote(jean, ayu));
-            
-            room.Execute(new WerewolfVote(fina, dita));
-            room.Execute(new WerewolfVote(ivanka, dita));
+            room.Vote(new WerewolfVote(ayu.ID, cinta.ID));
+            room.Vote(new WerewolfVote(cinta.ID, ayu.ID));
+            room.Vote(new WerewolfVote(dita.ID, ayu.ID));
+            room.Vote(new WerewolfVote(ester.ID, ayu.ID));
+            room.Vote(new WerewolfVote(fina.ID, ayu.ID));
+            room.Vote(new WerewolfVote(grace.ID, ayu.ID));
+            room.Vote(new WerewolfVote(hanako.ID, ayu.ID));
+            room.Vote(new WerewolfVote(ivanka.ID, ayu.ID));
+            room.Vote(new WerewolfVote(jean.ID, ayu.ID));
 
-            room.Vote(new WerewolfVote(cinta, fina));
-            room.Vote(new WerewolfVote(ester, fina));
-            room.Vote(new WerewolfVote(fina, ester));
-            room.Vote(new WerewolfVote(grace, fina));
-            room.Vote(new WerewolfVote(hanako, fina));
-            room.Vote(new WerewolfVote(ivanka, fina));
-            room.Vote(new WerewolfVote(jean, fina));
-            
-            room.Execute(new WerewolfVote(ivanka, grace));
+            room.Execute(new WerewolfVote(fina.ID, dita.ID));
+            room.Execute(new WerewolfVote(ivanka.ID, dita.ID));
 
-            room.Vote(new WerewolfVote(cinta, ivanka));
-            room.Vote(new WerewolfVote(ester, ivanka));
-            room.Vote(new WerewolfVote(hanako, ivanka));
-            room.Vote(new WerewolfVote(ivanka, hanako));
-            room.Vote(new WerewolfVote(jean, ivanka));
+            room.Vote(new WerewolfVote(cinta.ID, fina.ID));
+            room.Vote(new WerewolfVote(ester.ID, fina.ID));
+            room.Vote(new WerewolfVote(fina.ID, ester.ID));
+            room.Vote(new WerewolfVote(grace.ID, fina.ID));
+            room.Vote(new WerewolfVote(hanako.ID, fina.ID));
+            room.Vote(new WerewolfVote(ivanka.ID, fina.ID));
+            room.Vote(new WerewolfVote(jean.ID, fina.ID));
 
-            Assert.Equal(4, ayu.XP);
-            Assert.Equal(8, cinta.XP);
+            room.Execute(new WerewolfVote(ivanka.ID, grace.ID));
+
+            room.Vote(new WerewolfVote(cinta.ID, ivanka.ID));
+            room.Vote(new WerewolfVote(ester.ID, ivanka.ID));
+            room.Vote(new WerewolfVote(hanako.ID, ivanka.ID));
+            room.Vote(new WerewolfVote(ivanka.ID, hanako.ID));
+            room.Vote(new WerewolfVote(jean.ID, ivanka.ID));
+
+            Exception ex = null;
+            try
+            {
+                room.Vote(new WerewolfVote(cinta.ID, hanako.ID));
+            }
+            catch (Exception e)
+            {
+                ex = e;
+            }
+            Assert.True(ex != null);
         }
     }
 }

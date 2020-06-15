@@ -5,13 +5,22 @@ namespace Werewolf.NET.Game
 {
     public abstract class WolfNet : IObservable<WerewolfResult>
     {
-        protected List<User> _players;
+        protected List<Guid> _players;
         protected List<int> _userRoles;
         protected Roles werewolf;
         protected Roles villager;
         protected Roles seer;
         protected bool isNight;
         protected int count;
+        private Guid _id;
+
+        public Guid ID
+        {
+            get
+            {
+                return this._id;
+            }
+        }
 
         public Roles Werewolf
         {
@@ -36,12 +45,19 @@ namespace Werewolf.NET.Game
                 return this.seer;
             }
         }
-        
+
+        public WolfNet()
+        {
+            this._id = Guid.NewGuid();
+        }
+
         public abstract void Execute(Vote vote);
         public abstract void Vote(Vote vote);
-        protected abstract void ExecuteVillager(User killed);
-        protected abstract bool ExecuteWolf(User killed);
+        protected abstract void ExecuteVillager(Guid killed);
+        protected abstract bool ExecuteWolf(Guid killed);
         public abstract string GetGameName();
+        public abstract object GetMemento();
+        public abstract void LoadMemento(object memento);
 
         protected List<IObserver<WerewolfResult>> _observer = new List<IObserver<WerewolfResult>>();
         public void Attach(IObserver<WerewolfResult> obs)
@@ -59,9 +75,9 @@ namespace Werewolf.NET.Game
 
     public abstract class Vote
     {
-        protected User currentPlayer;
+        protected Guid currentPlayer;
 
-        public User Current
+        public Guid Current
         {
             get
             {
@@ -69,14 +85,14 @@ namespace Werewolf.NET.Game
             }
         }
 
-        public Vote(User current)
+        public Vote(Guid current)
         {
             this.currentPlayer = current;
         }
 
         public Vote()
         {
-            this.currentPlayer = new User();
+            this.currentPlayer = new Guid();
         }
 
     }

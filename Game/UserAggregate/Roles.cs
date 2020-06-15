@@ -7,7 +7,7 @@ namespace Werewolf.NET.Game
     {
         private int _id;
         private RoleName _name;
-        private List<User> _player;
+        private List<Guid> _player;
 
         public int ID
         {
@@ -25,7 +25,7 @@ namespace Werewolf.NET.Game
             }
         }
 
-        public List<User> Player
+        public List<Guid> Player
         {
             get
             {
@@ -37,14 +37,14 @@ namespace Werewolf.NET.Game
         {
             this._id = -1;
             this._name = null;
-            this._player = new List<User>();
+            this._player = new List<Guid>();
         }
 
         public Roles(int id, RoleName name)
         {
             this._id = id;
             this._name = name;
-            this._player = new List<User>();
+            this._player = new List<Guid>();
         }
 
         public static Roles createRole(int id, string name)
@@ -53,12 +53,12 @@ namespace Werewolf.NET.Game
             return new Roles(id, rn);
         }
 
-        public void AddPlayer(User player)
+        public void AddPlayer(Guid player)
         {
             this._player.Add(player);
         }
 
-        public void removePlayer(User player)
+        public void removePlayer(Guid player)
         {
             this._player.Remove(player);
         }

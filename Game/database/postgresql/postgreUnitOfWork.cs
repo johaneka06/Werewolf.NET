@@ -14,6 +14,8 @@ namespace Werewolf.NET.Game.Database.PostgreSQL
         private NpgsqlTransaction _transaction;
 
         private IUserRepository _userRepository;
+        private IRoleRepository _roleRepository;
+        private IRoomRepository _roomRepository;
 
         public postgreUnitOfWork(string connectionString)
         {
@@ -29,6 +31,24 @@ namespace Werewolf.NET.Game.Database.PostgreSQL
             {
                 if (_userRepository == null) _userRepository = new UserRepository(_connection, _transaction);
                 return _userRepository;
+            }
+        }
+
+        public IRoleRepository RoleRepo
+        {
+            get
+            {
+                if (_roleRepository == null) _roleRepository = new RoleRepository(_connection, _transaction);
+                return _roleRepository;
+            }
+        }
+
+        public IRoomRepository RoomRepo
+        {
+            get
+            {
+                if (_roomRepository == null) _roomRepository = new RoomRepository(_connection, _transaction);
+                return _roomRepository;
             }
         }
 

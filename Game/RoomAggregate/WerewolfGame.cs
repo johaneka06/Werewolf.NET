@@ -1,26 +1,31 @@
 using System;
 using System.Collections.Generic;
+using Npgsql;
+
+using Werewolf.NET.Game.Database.PostgreSQL;
 
 namespace Werewolf.NET.Game
 {
 
     public class WerewolfVote : Vote
     {
-        private User votedPlayer;
+        private Guid votedPlayer;
 
-        public User Executed
+        public Guid Executed
         {
             get
             {
                 return this.votedPlayer;
             }
         }
+
         public WerewolfVote()
         {
-            this.votedPlayer = new User();
+            currentPlayer = new Guid();
+            this.votedPlayer = new Guid();
         }
 
-        public WerewolfVote(User current, User VotedUser) : base(current)
+        public WerewolfVote(Guid current, Guid VotedUser) : base(current)
         {
             this.votedPlayer = VotedUser;
         }
@@ -30,7 +35,7 @@ namespace Werewolf.NET.Game
     {
         protected bool _gameEnded;
         protected int totalPlayer;
-        public WerewolfGame(List<User> players, List<int> UserRoles)
+        public WerewolfGame(List<Guid> players, List<int> UserRoles)
         {
             werewolf = new Roles(1, new RoleName("Werewolf"));
             villager = new Roles(2, new RoleName("Villager"));
@@ -46,7 +51,7 @@ namespace Werewolf.NET.Game
             isNight = true;
             count = 0;
             totalPlayer = _players.Count;
-            
+
             int idx = 0;
             foreach (int RoleIdx in _userRoles)
             {
@@ -57,19 +62,26 @@ namespace Werewolf.NET.Game
             }
 
             villagerToBeKilled = new WerewolfVote();
-            UserVoted = new List<User>();
+            UserVoted = new List<Guid>();
             VoteNumber = new List<int>();
-        }
 
+            string connectionStr = "Host=localhost;Username=postgres;Password=postgres;Database=WerewolfDB;Port=5432";
+
+            _connection = new NpgsqlConnection(connectionStr);
+            UserRepo = new UserRepository(_connection, null);
+        }
+        private NpgsqlConnection _connection;
         private WerewolfVote villagerToBeKilled;
-        private List<User> UserVoted;
+        private List<Guid> UserVoted;
         private List<int> VoteNumber;
+        private IUserRepository UserRepo;
         private int maxCount = 0;
 
         public override void Execute(Vote vote)
         {
             WerewolfVote v = vote as WerewolfVote;
-            if(isNight){
+            if (isNight)
+            {
                 if (werewolf.Player.Contains(v.Current)) //Werewolf
                 {
                     villagerToBeKilled = v;
@@ -97,19 +109,23 @@ namespace Werewolf.NET.Game
 
                     _gameEnded = true;
 
-                    foreach (User winner in werewolf.Player)
+                    foreach (Guid winner in werewolf.Player)
                     {
                         Broadcast(new Win(winner));
                     }
                 }
             }
-            else throw new Exception ("Cannot execute in day!");
+            else throw new Exception("Cannot execute in day!");
         }
+        private Guid currentId;
         public override void Vote(Vote vote)
         {
             WerewolfVote v = vote as WerewolfVote;
 
-            if(!isNight){
+            currentId = v.Current;
+
+            if (!isNight)
+            {
                 if (!UserVoted.Contains(v.Executed))
                 {
                     UserVoted.Add(v.Executed);
@@ -131,7 +147,7 @@ namespace Werewolf.NET.Game
 
                 Console.WriteLine("Vote Count: " + count);
 
-                User wastedUser = new User();
+                Guid wastedUser = new Guid();
 
                 if (count == totalPlayer)
                 {
@@ -142,12 +158,15 @@ namespace Werewolf.NET.Game
                         {
                             maxCount = VoteNumber[i];
                             wastedUser = UserVoted[i];
-                            Console.WriteLine(wastedUser.Name);
+                            Console.WriteLine(wastedUser);
                         }
                     }
-                    string Name = wastedUser.Name;
-                    if (ExecuteWolf(wastedUser)) Console.WriteLine("You have eliminate wolf: " + Name);
-                    else Console.WriteLine("Uh. You killed the wrong wolf: " + Name);
+                    _connection.Open();
+                    User newUser = UserRepo.FindById(wastedUser);
+                    string Name = "";
+                    if(newUser != null) Name = newUser.Name; //Find via repo
+                    if (ExecuteWolf(wastedUser)) Console.WriteLine("You have eliminate wolf: " + wastedUser + " - " + Name);
+                    else Console.WriteLine("Uh. You killed the wrong wolf: " + wastedUser + " - " + Name);
 
                     totalPlayer--;
                     Console.WriteLine("Player count: " + totalPlayer);
@@ -155,6 +174,8 @@ namespace Werewolf.NET.Game
                     count = 0;
                     UserVoted.Clear();
                     VoteNumber.Clear();
+
+                    _connection.Close();
                 }
 
                 if (isWin())
@@ -164,12 +185,12 @@ namespace Werewolf.NET.Game
 
                     _gameEnded = true;
 
-                    foreach (User winner in villager.Player)
+                    foreach (Guid winner in villager.Player)
                     {
                         Broadcast(new Win(winner));
                     }
 
-                    foreach (User winner in seer.Player)
+                    foreach (Guid winner in seer.Player)
                     {
                         Broadcast(new Win(winner));
                     }
@@ -179,7 +200,7 @@ namespace Werewolf.NET.Game
         }
 
         //Execute villager means it is night. The werewolf execute other player
-        protected override void ExecuteVillager(User killed)
+        protected override void ExecuteVillager(Guid killed)
         {
             Broadcast(new Lose(killed));
 
@@ -192,20 +213,20 @@ namespace Werewolf.NET.Game
                 villager.removePlayer(killed);
             }
 
-            Console.WriteLine("Player Died: " + killed.Name);
+            Console.WriteLine("Player Died: " + killed);
 
             totalPlayer--;
 
             count = 0;
 
             villagerToBeKilled = null;
-            killed = null;
+            killed = new Guid();
 
             isNight = !isNight;
         }
 
         //ExecuteWolf means it is day. Players do their vote to determine which player is the wolf
-        protected override bool ExecuteWolf(User killed)
+        protected override bool ExecuteWolf(Guid killed)
         {
             Broadcast(new Lose(killed));
 
@@ -222,10 +243,10 @@ namespace Werewolf.NET.Game
             else if (Seer.Player.Contains(killed)) seer.removePlayer(killed);
             else villager.removePlayer(killed);
 
-            Console.WriteLine("Player Died: " + killed.Name);
+            Console.WriteLine("Player Died: " + killed);
 
             villagerToBeKilled = null;
-            killed = null;
+            killed = new Guid();
 
             count = 0;
 
@@ -245,6 +266,39 @@ namespace Werewolf.NET.Game
         public override string GetGameName()
         {
             return "Werewolf";
+        }
+
+        public override object GetMemento()
+        {
+            return new WerewolfMemento(_players, _userRoles, currentId, _gameEnded);
+        }
+
+        public override void LoadMemento(object memento)
+        {
+            var m = memento as WerewolfMemento;
+            if (m == null) throw new Exception("Wrong memento");
+
+            this.currentId = m.currentPlayer;
+            this._gameEnded = m.GameEnded;
+            this._userRoles = m.Roles;
+            this._players = m.Player;
+        }
+    }
+
+    public class WerewolfMemento
+    {
+        public bool GameEnded { get; set; }
+        public List<Guid> Player { get; set; }
+        public List<int> Roles { get; set; }
+        public Guid currentPlayer { get; set; }
+
+        public WerewolfMemento() { }
+        public WerewolfMemento(List<Guid> player, List<int> role, Guid currentPlayer, bool gameEnded)
+        {
+            this.GameEnded = gameEnded;
+            this.Player = player;
+            this.Roles = role;
+            this.currentPlayer = currentPlayer;
         }
     }
 }

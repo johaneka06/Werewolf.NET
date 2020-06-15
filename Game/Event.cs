@@ -4,8 +4,8 @@ namespace Werewolf.NET.Game
 {
     public abstract class WerewolfResult
     {
-        public User Player { get; private set; }
-        public WerewolfResult(User player)
+        public Guid Player { get; private set; }
+        public WerewolfResult(Guid player)
         {
             this.Player = player;
         }
@@ -13,11 +13,11 @@ namespace Werewolf.NET.Game
 
     public class Win : WerewolfResult
     {
-        public Win(User player) : base(player) { }
+        public Win(Guid player) : base(player) { }
     }
 
     public class Lose : WerewolfResult
     {
-        public Lose(User player) : base(player) { }
+        public Lose(Guid player) : base(player) { }
     }
 }

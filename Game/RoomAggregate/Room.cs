@@ -6,7 +6,7 @@ namespace Werewolf.NET.Game
     public class Room
     {
         private Guid _id;
-        private List<User> _player;
+        private List<Guid> _player;
         private List<int> _roles;
         private WolfNet _game;
         private int _maxUser;
@@ -19,7 +19,7 @@ namespace Werewolf.NET.Game
             }
         }
 
-        public List<User> Players
+        public List<Guid> Players
         {
             get
             {
@@ -41,6 +41,18 @@ namespace Werewolf.NET.Game
             {
                 return this._game;
             }
+            set
+            {
+                this.Game = value;
+            }
+        }
+
+        public Room(Guid id, int Max)
+        {
+            this._id = id;
+            this._maxUser = Max;
+            this._player = new List<Guid>();
+            this._roles = new List<int>();
         }
 
         public Room(int max)
@@ -49,7 +61,7 @@ namespace Werewolf.NET.Game
 
             this._id = Guid.NewGuid();
             this._maxUser = max;
-            this._player = new List<User>();
+            this._player = new List<Guid>();
             this._roles = new List<int>();
             this._game = null;
         }
@@ -59,7 +71,7 @@ namespace Werewolf.NET.Game
             if (_game != null) throw new Exception("Game already started");
             else if (_player.Count < _maxUser)
             {
-                _player.Add(player);
+                _player.Add(player.ID);
                 _roles.Add(role);
             }
             else if (_player.Count >= _maxUser)
@@ -68,19 +80,21 @@ namespace Werewolf.NET.Game
             }
         }
 
-        public void StartGame(string game)
+        public void StartGame(string game, IUserRepository userRepo = null)
         {
-            _game = GameFactory.Create(game, _player, _roles);
+            _game = GameFactory.Create(game, _player, _roles, userRepo, "");
         }
 
-        public void Execute(Vote vote){
-            if(_game == null) throw new Exception("Game isn't exist");
+        public void Execute(Vote vote)
+        {
+            if (_game == null) throw new Exception("Game isn't exist");
 
             _game.Execute(vote);
         }
 
-        public void Vote(Vote vote){
-            if(_game == null) throw new Exception("Game isn't exist");
+        public void Vote(Vote vote)
+        {
+            if (_game == null) throw new Exception("Game isn't exist");
 
             _game.Vote(vote);
         }

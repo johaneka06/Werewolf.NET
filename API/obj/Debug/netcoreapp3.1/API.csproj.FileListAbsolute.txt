@@ -21,3 +21,5 @@ D:\Coba\Project\DDD\Werewolf.NET\API\obj\Debug\netcoreapp3.1\staticwebassets\API
 D:\Coba\Project\DDD\Werewolf.NET\API\obj\Debug\netcoreapp3.1\API.dll
 D:\Coba\Project\DDD\Werewolf.NET\API\obj\Debug\netcoreapp3.1\API.pdb
 D:\Coba\Project\DDD\Werewolf.NET\API\obj\Debug\netcoreapp3.1\API.genruntimeconfig.cache
+D:\Coba\Project\DDD\Werewolf.NET\API\bin\Debug\netcoreapp3.1\Newtonsoft.Json.dll
+D:\Coba\Project\DDD\Werewolf.NET\API\bin\Debug\netcoreapp3.1\Npgsql.dll
