@@ -1,6 +1,7 @@
 using System;
 using Xunit;
 using Npgsql;
+using NpgsqlTypes;
 using Werewolf.NET.Game.Database.PostgreSQL;
 using Werewolf.NET.Game;
 
@@ -10,7 +11,8 @@ namespace Test
     {
         private string connectionStr;
 
-        public UserRepositoryTest(){
+        public UserRepositoryTest()
+        {
             connectionStr = "Host=localhost;Username=postgres;Password=postgres;Database=WerewolfDB;Port=5432";
         }
 
@@ -55,6 +57,45 @@ namespace Test
             Assert.True(userRepo != null);
 
             Assert.Equal(30, userFound.XP);
+
+            _connection.Close();
+        }
+
+        [Fact]
+        public void SnapshotTest()
+        {
+            NpgsqlConnection _connection = new NpgsqlConnection(connectionStr);
+            _connection.Open();
+
+            IUserRepository repo = new UserRepository(_connection, null);
+
+            User u = User.createUser("Alicia");
+            repo.Create(u);
+
+            for (int i = 1; i <= 75; i++)
+            {
+                repo.AddExp(u, 3);
+            }
+
+            User u2 = repo.FindById(u.ID);
+            Assert.Equal(225, u2.XP);
+
+            int expFromSnapshot = 0;
+            string query = "SELECT expvalue FROM exp_snapshot WHERE userid = @id ORDER BY created_at DESC LIMIT 1";
+            using (var cmd = new NpgsqlCommand(query, _connection))
+            {
+                cmd.Parameters.AddWithValue("id", u.ID);
+
+                using (NpgsqlDataReader reader = cmd.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        expFromSnapshot = reader.GetInt32(0);
+                    }
+                }
+            }
+
+            Assert.Equal(150, expFromSnapshot);
 
             _connection.Close();
         }

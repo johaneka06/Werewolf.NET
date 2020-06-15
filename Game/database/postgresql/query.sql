@@ -66,3 +66,14 @@ CREATE TABLE game
 	deleted_at	TIMESTAMPTZ,
 	FOREIGN KEY (roomId) REFERENCES "game_room"(roomId)
 );
+
+CREATE TABLE "exp_snapshot"
+(
+	snapshotId		UUID PRIMARY KEY,
+	lastSnapshotID	UUID,
+	userId			UUID,
+	expValue		INT,
+	created_at		TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+	lastSnapshotAt	TIMESTAMPTZ,
+	FOREIGN KEY (userId) REFERENCES "user"(userId)
+);
