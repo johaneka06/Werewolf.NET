@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Npgsql;
 using NpgsqlTypes;
 
@@ -19,7 +20,7 @@ namespace Werewolf.NET.Game.Database.PostgreSQL
         {
             string query =
                 "SELECT username from \"user\" WHERE userId = @id";
-            
+
             string name = "";
 
             using (var cmd = new NpgsqlCommand(query, _connection, _transaction))
@@ -35,6 +36,30 @@ namespace Werewolf.NET.Game.Database.PostgreSQL
             }
             User u = new User(id, name, new Exp(GetExp(id)));
             return u;
+        }
+
+        public List<User> GetAllUser()
+        {
+            string query = @"SELECT u.userId, username, coalesce(xp, 0) FROM ""user"" u
+                LEFT JOIN
+                    (SELECT userId, sum(xpvalue) as xp FROM exp GROUP BY userId) e ON e.userId = u.userId";
+
+            List<User> users = new List<User>();
+            User user;
+
+            using (var cmd = new NpgsqlCommand(query, _connection, _transaction))
+            {
+                using (NpgsqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        user = new User(reader.GetGuid(0), reader.GetString(1), new Exp(reader.GetInt32(2)));
+                        users.Add(user);
+                    }
+                }
+            }
+
+            return users;
         }
 
         public void Create(User user)

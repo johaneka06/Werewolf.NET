@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
 using Werewolf.NET.Game;
+using Werewolf.NET.Game.Database.PostgreSQL;
+using Npgsql;
 
 namespace API.Controllers
 {
@@ -23,71 +25,17 @@ namespace API.Controllers
         [HttpGet]
         public List<User> Get()
         {
-            newClass nw = new newClass();
-            return nw.Player;
-        }
+            string connectionStr = "Host=localhost;Username=postgres;Password=postgres;Database=WerewolfDB;Port=5432";
+            NpgsqlConnection _connection = new NpgsqlConnection(connectionStr);
+            _connection.Open();
 
-    }
-    public class newClass{
-        private List<User> Players;
-        private List<int> PlayerRole;
-        
-        User ayu;
-        User bani;
-        User cinta;
-        User dita;
-        User ester;
-        User fina;
-        User grace;
-        User hanako;
-        User ivanka;
-        User jean;
+            IUserRepository repo = new UserRepository(_connection, null);
 
-        public List<User> Player
-        {
-            get
-            {
-                return this.Players;
-            }
-        }
+            List<User> users = repo.GetAllUser();
 
-        public newClass()
-        {
-            this.Players = new List<User>();
-            this.PlayerRole = new List<int>();
+            _connection.Close();
 
-            ayu = User.createUser("Ayu");
-            bani = User.createUser("Bani");
-            cinta = User.createUser("Cinta");
-            dita = User.createUser("Dita");
-            ester = User.createUser("Ester");
-            fina = User.createUser("Fina");
-            grace = User.createUser("Grace");
-            hanako = User.createUser("Hanako");
-            ivanka = User.createUser("Ivanka");
-            jean = User.createUser("Jean");
-
-            Players.Add(ayu);
-            Players.Add(bani);
-            Players.Add(cinta);
-            Players.Add(dita);
-            Players.Add(ester);
-            Players.Add(fina);
-            Players.Add(grace);
-            Players.Add(hanako);
-            Players.Add(ivanka);
-            Players.Add(jean);
-
-            PlayerRole.Add(1);
-            PlayerRole.Add(3);
-            PlayerRole.Add(2);
-            PlayerRole.Add(2);
-            PlayerRole.Add(2);
-            PlayerRole.Add(1);
-            PlayerRole.Add(2);
-            PlayerRole.Add(2);
-            PlayerRole.Add(1);
-            PlayerRole.Add(2);
+            return users;
         }
 
     }

@@ -99,5 +99,58 @@ namespace Test
 
             _connection.Close();
         }
+
+        [Fact]
+        public void InsertUser()
+        {
+            NpgsqlConnection _connection = new NpgsqlConnection(connectionStr);
+            _connection.Open();
+
+            IUserRepository repo = new UserRepository(_connection, null);
+
+            User ayu, bani, cinta, dita, ester, fina, grace, hanako, ivanka, jean;
+
+            ayu = User.createUser("Ayu");
+            repo.Create(ayu);
+            repo.AddExp(ayu, 8);
+
+            bani = User.createUser("Bani");
+            repo.Create(bani);
+            repo.AddExp(bani, 4);
+
+            cinta = User.createUser("Cinta");
+            repo.Create(cinta);
+            repo.AddExp(cinta, 4);
+
+            dita = User.createUser("Dita");
+            repo.Create(dita);
+            repo.AddExp(dita, 4);
+
+            ester = User.createUser("Ester");
+            repo.Create(ester);
+            repo.AddExp(ester, 4);
+
+            fina = User.createUser("Fina");
+            repo.Create(fina);
+            repo.AddExp(fina, 8);
+
+            grace = User.createUser("Grace");
+            repo.Create(grace);
+            repo.AddExp(grace, 4);
+
+            hanako = User.createUser("Hanako");
+            repo.Create(hanako);
+            repo.AddExp(hanako, 4);
+
+            ivanka = User.createUser("Ivanka");
+            repo.Create(ivanka);
+            repo.AddExp(ivanka, 8);
+
+            jean = User.createUser("Jean");
+            repo.Create(jean);
+            repo.AddExp(jean, 4);
+
+            _connection.Close();
+        }
     }
 }
