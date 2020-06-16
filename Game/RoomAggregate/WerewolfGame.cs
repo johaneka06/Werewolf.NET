@@ -1,8 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Npgsql;
-
-using Werewolf.NET.Game.Database.PostgreSQL;
 
 namespace Werewolf.NET.Game
 {
@@ -64,17 +61,11 @@ namespace Werewolf.NET.Game
             villagerToBeKilled = new WerewolfVote();
             UserVoted = new List<Guid>();
             VoteNumber = new List<int>();
-
-            string connectionStr = "Host=localhost;Username=postgres;Password=postgres;Database=WerewolfDB;Port=5432";
-
-            _connection = new NpgsqlConnection(connectionStr);
-            UserRepo = new UserRepository(_connection, null);
         }
-        private NpgsqlConnection _connection;
+
         private WerewolfVote villagerToBeKilled;
         private List<Guid> UserVoted;
         private List<int> VoteNumber;
-        private IUserRepository UserRepo;
         private int maxCount = 0;
 
         public override void Execute(Vote vote)
@@ -161,12 +152,9 @@ namespace Werewolf.NET.Game
                             Console.WriteLine(wastedUser);
                         }
                     }
-                    _connection.Open();
-                    User newUser = UserRepo.FindById(wastedUser);
-                    string Name = "";
-                    if(newUser != null) Name = newUser.Name; //Find via repo
-                    if (ExecuteWolf(wastedUser)) Console.WriteLine("You have eliminate wolf: " + wastedUser + " - " + Name);
-                    else Console.WriteLine("Uh. You killed the wrong wolf: " + wastedUser + " - " + Name);
+
+                    if (ExecuteWolf(wastedUser)) Console.WriteLine("You have eliminate wolf: " + wastedUser);
+                    else Console.WriteLine("Uh. You killed the wrong wolf: " + wastedUser);
 
                     totalPlayer--;
                     Console.WriteLine("Player count: " + totalPlayer);
@@ -174,8 +162,6 @@ namespace Werewolf.NET.Game
                     count = 0;
                     UserVoted.Clear();
                     VoteNumber.Clear();
-
-                    _connection.Close();
                 }
 
                 if (isWin())
