@@ -17,3 +17,5 @@
 ## Logic
 
 At WolfNet.cs, there's a list of integer that will be used to assign the role of each player. At WerewolfGame.cs, each element of this list are used to assign player based on their role.
+
+Each player is considered lose if player is executed by wolf at night or if player is executed by villager at noon
