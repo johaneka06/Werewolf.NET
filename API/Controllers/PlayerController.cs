@@ -25,15 +25,10 @@ namespace API.Controllers
         [HttpGet]
         public List<User> Get()
         {
-            string connectionStr = "Host=localhost;Username=postgres;Password=postgres;Database=WerewolfDB;Port=5432";
-            NpgsqlConnection _connection = new NpgsqlConnection(connectionStr);
-            _connection.Open();
-
-            IUserRepository repo = new UserRepository(_connection, null);
-
-            List<User> users = repo.GetAllUser();
-
-            _connection.Close();
+            DotNetEnv.Env.Load(); 
+            postgreUnitOfWork unit = new postgreUnitOfWork(System.Environment.GetEnvironmentVariable("CONN_STR"));
+            
+            List<User> users = unit.UserRepo.GetAllUser();
 
             return users;
         }
