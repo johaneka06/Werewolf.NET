@@ -8,11 +8,19 @@ This notes is written in Bahasa Indonesia.
 
 ### Connection string at API
 
+Before:
+
 [Link](https://github.com/johaneka06/Werewolf.NET/blob/master/API/Controllers/PlayerController.cs#L28)
 
 connection string jangan taro di API layer. itu harusnya infrastructure layer.
 
 paling bagusnya bikin .env gitu, tapi karena ini toy project aja, bikin hard code string aja kyk gini tapi di infrastructure layer (di implementasi repo).
+
+After:
+
+[Link](https://github.com/johaneka06/Werewolf.NET/blob/master/API/.env)
+
+Connection string added
 
 ### Open connection at API
 
