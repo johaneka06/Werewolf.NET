@@ -33,5 +33,26 @@ namespace API.Controllers
             return users;
         }
 
+        [HttpPost]
+        public ActionResult<User> Post([FromBody]NewUser newUser)
+        {
+            User u = Player.createUser(newUser.name);
+
+            DotNetEnv.Env.Load();
+            postgreUnitOfWork db = new postgreUnitOfWork(System.Environment.GetEnvironmentVariable("CONN_STR"));
+
+            db.UserRepo.Create(u);
+            db.Commit();
+
+            User current = db.UserRepo.FindById(u.ID);
+
+            return u;
+        }
+
+    }
+
+    public class NewUser
+    {
+        public string name {get; set;}
     }
 }
